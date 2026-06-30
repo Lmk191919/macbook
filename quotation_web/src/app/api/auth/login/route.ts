@@ -30,17 +30,17 @@ export async function POST(request: NextRequest) {
   const parsed = loginSchema.safeParse(payload);
 
   if (!parsed.success) {
-    return NextResponse.redirect(new URL("/login?error=1", request.url));
+    return NextResponse.redirect(new URL("/login?error=1", request.url), { status: 303 });
   }
 
   const teamPassword = getTeamPassword();
   const sessionSecret = getSessionSecret();
 
   if (!verifyTeamPassword(parsed.data.password, teamPassword)) {
-    return NextResponse.redirect(new URL("/login?error=1", request.url));
+    return NextResponse.redirect(new URL("/login?error=1", request.url), { status: 303 });
   }
 
-  const response = NextResponse.redirect(new URL("/quotes", request.url));
+  const response = NextResponse.redirect(new URL("/quotes", request.url), { status: 303 });
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
     value: await createSessionToken(sessionSecret, SESSION_TTL_SECONDS),

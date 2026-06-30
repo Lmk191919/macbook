@@ -44,6 +44,10 @@ type RepositoryState = Readonly<{
   catalogItems: CatalogItemRecord[];
 }>;
 
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+
 const DEFAULT_STATE: RepositoryState = {
   counters: {
     quote: 1,
@@ -190,15 +194,16 @@ export class FileQuotationRepository implements QuotationRepository {
       if (quote.version !== version) {
         throw versionConflict("VERSION_CONFLICT");
       }
+      const mutableQuote = quote as Mutable<QuoteRecord>;
 
       const updatedAt = nowIso();
-      Object.assign(quote, definedPatch(this.normalizeQuotePatch(input)));
-      quote.version += 1;
-      quote.updatedAt = updatedAt;
+      Object.assign(mutableQuote, definedPatch(this.normalizeQuotePatch(input)));
+      mutableQuote.version += 1;
+      mutableQuote.updatedAt = updatedAt;
 
-      this.validateQuote(quote);
+      this.validateQuote(mutableQuote);
 
-      return cloneRecord(quote);
+      return cloneRecord(mutableQuote);
     });
   }
 
@@ -208,9 +213,10 @@ export class FileQuotationRepository implements QuotationRepository {
       if (quote.version !== version) {
         throw versionConflict("VERSION_CONFLICT");
       }
+      const mutableQuote = quote as Mutable<QuoteRecord>;
 
       Object.assign(
-        quote,
+        mutableQuote,
         definedPatch({
           customerName: input.customerName?.trim(),
           customerPhone: input.customerPhone?.trim(),
@@ -223,7 +229,7 @@ export class FileQuotationRepository implements QuotationRepository {
         }),
       );
 
-      quote.spaces = input.spaces
+      mutableQuote.spaces = input.spaces
         .map((space, spaceIndex) => {
           const nextSpace: QuoteSpaceRecord = {
             id: this.resolvePersistentId(state, "space", space.id),
@@ -256,7 +262,7 @@ export class FileQuotationRepository implements QuotationRepository {
         })
         .sort((left, right) => left.sortOrder - right.sortOrder);
 
-      quote.adjustments = input.adjustments
+      mutableQuote.adjustments = input.adjustments
         .map((adjustment, index) => {
           const nextAdjustment: QuoteAdjustmentRecord = {
             id: this.resolvePersistentId(state, "adjustment", adjustment.id),
@@ -271,9 +277,9 @@ export class FileQuotationRepository implements QuotationRepository {
         })
         .sort((left, right) => left.sortOrder - right.sortOrder);
 
-      this.touchQuote(quote);
-      this.validateQuote(quote);
-      return cloneRecord(quote);
+      this.touchQuote(mutableQuote);
+      this.validateQuote(mutableQuote);
+      return cloneRecord(mutableQuote);
     });
   }
 
@@ -282,14 +288,15 @@ export class FileQuotationRepository implements QuotationRepository {
       const quote = this.requireQuote(state, quoteId);
       const timestamp = nowIso();
       const copied = cloneRecord(quote);
+      const mutableCopied = copied as Mutable<QuoteRecord>;
 
-      copied.id = this.nextId(state, "quote");
-      copied.quoteNo = quoteNoFor(new Date(timestamp), state.counters.quote - 1);
-      copied.customerName = `${quote.customerName}副本`;
-      copied.createdAt = timestamp;
-      copied.updatedAt = timestamp;
-      copied.version = 1;
-      copied.spaces = copied.spaces.map((space) => ({
+      mutableCopied.id = this.nextId(state, "quote");
+      mutableCopied.quoteNo = quoteNoFor(new Date(timestamp), state.counters.quote - 1);
+      mutableCopied.customerName = `${quote.customerName}副本`;
+      mutableCopied.createdAt = timestamp;
+      mutableCopied.updatedAt = timestamp;
+      mutableCopied.version = 1;
+      mutableCopied.spaces = copied.spaces.map((space) => ({
         ...space,
         id: this.nextId(state, "space"),
         items: space.items.map((item) => ({
@@ -297,13 +304,13 @@ export class FileQuotationRepository implements QuotationRepository {
           id: this.nextId(state, "item"),
         })),
       }));
-      copied.adjustments = copied.adjustments.map((adjustment) => ({
+      mutableCopied.adjustments = copied.adjustments.map((adjustment) => ({
         ...adjustment,
         id: this.nextId(state, "adjustment"),
       }));
 
-      state.quotes.push(copied);
-      return cloneRecord(copied);
+      state.quotes.push(mutableCopied);
+      return cloneRecord(mutableCopied);
     });
   }
 
@@ -356,7 +363,7 @@ export class FileQuotationRepository implements QuotationRepository {
   async reorderSpaces(quoteId: string, orderedSpaceIds: readonly string[]): Promise<QuoteRecord> {
     return this.mutateState((state) => {
       const quote = this.requireQuote(state, quoteId);
-      quote.spaces = updateOrdering(quote.spaces, orderedSpaceIds);
+      (quote as Mutable<QuoteRecord>).spaces = updateOrdering(quote.spaces, orderedSpaceIds);
       this.touchQuote(quote);
       return cloneRecord(quote);
     });
@@ -424,7 +431,7 @@ export class FileQuotationRepository implements QuotationRepository {
     return this.mutateState((state) => {
       const quote = this.requireQuote(state, quoteId);
       const space = this.requireSpace(quote, spaceId);
-      space.items = updateOrdering(space.items, orderedItemIds);
+      (space as Mutable<QuoteSpaceRecord>).items = updateOrdering(space.items, orderedItemIds);
       this.touchQuote(quote);
       return cloneRecord(quote);
     });
@@ -483,7 +490,7 @@ export class FileQuotationRepository implements QuotationRepository {
   async reorderAdjustments(quoteId: string, orderedAdjustmentIds: readonly string[]): Promise<QuoteRecord> {
     return this.mutateState((state) => {
       const quote = this.requireQuote(state, quoteId);
-      quote.adjustments = updateOrdering(quote.adjustments, orderedAdjustmentIds);
+      (quote as Mutable<QuoteRecord>).adjustments = updateOrdering(quote.adjustments, orderedAdjustmentIds);
       this.touchQuote(quote);
       return cloneRecord(quote);
     });
@@ -804,8 +811,9 @@ export class FileQuotationRepository implements QuotationRepository {
   }
 
   private touchQuote(quote: QuoteRecord): void {
-    quote.version += 1;
-    quote.updatedAt = nowIso();
+    const mutableQuote = quote as Mutable<QuoteRecord>;
+    mutableQuote.version += 1;
+    mutableQuote.updatedAt = nowIso();
   }
 
   private validateQuote(quote: QuoteRecord): void {

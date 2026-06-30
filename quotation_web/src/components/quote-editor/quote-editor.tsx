@@ -191,7 +191,11 @@ export function QuoteEditor({ initialQuote, catalogItems, onSave, saveUrl }: Quo
       throw error;
     }
 
-    return { version: payload.data.version };
+    if ("data" in payload) {
+      return { version: payload.data.version };
+    }
+
+    throw new Error("SAVE_FAILED");
   }
 
   const autosave = useAutosave({

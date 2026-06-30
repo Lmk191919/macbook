@@ -1,4 +1,3 @@
-import { type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { DEFAULT_SPACE_NAMES } from "@/domain/catalog";
@@ -37,7 +36,7 @@ async function addDefaultSpaces(repository: Awaited<ReturnType<typeof createQuot
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     const repository = await createQuotationRepository();
     const quotes = await repository.listQuotes(new URL(request.url).searchParams.get("query") ?? "");
@@ -47,7 +46,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const parsed = quoteCreateSchema.safeParse(await parseJsonBody(request));
   if (!parsed.success) {
     return errorResponse("VALIDATION_ERROR", parsed.error.issues[0]?.message ?? "Invalid request");

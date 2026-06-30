@@ -1,23 +1,26 @@
-import crypto from "node:crypto";
-
 import { CompactSign, compactVerify } from "jose";
 
 export const SESSION_COOKIE_NAME = "quote_session";
 export const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
 
 function getKey(secret: string): Uint8Array {
-  return Buffer.from(secret, "utf8");
+  return new TextEncoder().encode(secret);
 }
 
 export function verifyTeamPassword(submittedPassword: string, expectedPassword: string): boolean {
-  const submitted = Buffer.from(submittedPassword);
-  const expected = Buffer.from(expectedPassword);
+  const submitted = new TextEncoder().encode(submittedPassword);
+  const expected = new TextEncoder().encode(expectedPassword);
 
   if (submitted.length !== expected.length) {
     return false;
   }
 
-  return crypto.timingSafeEqual(submitted, expected);
+  let difference = 0;
+  for (let index = 0; index < submitted.length; index += 1) {
+    difference |= submitted[index] ^ expected[index];
+  }
+
+  return difference === 0;
 }
 
 export async function createSessionToken(secret: string, ttlSeconds: number): Promise<string> {
@@ -28,7 +31,7 @@ export async function createSessionToken(secret: string, ttlSeconds: number): Pr
     exp: issuedAt + ttlSeconds,
   };
 
-  return new CompactSign(Buffer.from(JSON.stringify(payload), "utf8"))
+  return new CompactSign(new TextEncoder().encode(JSON.stringify(payload)))
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .sign(getKey(secret));
 }
@@ -39,7 +42,7 @@ export async function verifySessionToken(token: string, secret: string): Promise
       algorithms: ["HS256"],
     });
 
-    const parsed = JSON.parse(Buffer.from(payload).toString("utf8")) as {
+    const parsed = JSON.parse(new TextDecoder().decode(payload)) as {
       kind?: string;
       exp?: number;
     };

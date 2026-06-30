@@ -1,4 +1,3 @@
-import { type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { errorResponse, parseJsonBody, repositoryErrorResponse, successResponse } from "@/app/api/_utils";
@@ -19,7 +18,7 @@ const catalogCreateSchema = z.object({
   sortOrder: z.number().int().nonnegative().optional(),
 });
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   const repository = await createQuotationRepository();
   await ensureCatalogSeeded(repository);
 
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest) {
   return successResponse(items);
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const parsed = catalogCreateSchema.safeParse(await parseJsonBody(request));
   if (!parsed.success) {
     return errorResponse("VALIDATION_ERROR", parsed.error.issues[0]?.message ?? "Invalid request");

@@ -45,6 +45,11 @@ export function NewQuoteDialog({ onCreated }: NewQuoteDialogProps) {
         return;
       }
 
+      if (!("data" in body)) {
+        setError("创建报价失败");
+        return;
+      }
+
       const quoteId = body.data.id;
       setOpen(false);
       onCreated?.(quoteId);

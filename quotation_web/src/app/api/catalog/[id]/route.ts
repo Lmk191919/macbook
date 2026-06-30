@@ -1,4 +1,3 @@
-import { type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { errorResponse, parseJsonBody, repositoryErrorResponse, resolveParams, successResponse } from "@/app/api/_utils";
@@ -19,7 +18,7 @@ const catalogUpdateSchema = z.object({
 });
 
 export async function GET(
-  _request: NextRequest,
+  _request: Request,
   context: { params: { id: string } | Promise<{ id: string }> },
 ) {
   const { id } = await resolveParams(context.params);
@@ -34,7 +33,7 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   context: { params: { id: string } | Promise<{ id: string }> },
 ) {
   const parsed = catalogUpdateSchema.safeParse(await parseJsonBody(request));
@@ -53,7 +52,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  _request: Request,
   context: { params: { id: string } | Promise<{ id: string }> },
 ) {
   try {

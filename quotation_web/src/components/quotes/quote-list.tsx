@@ -9,6 +9,8 @@ import type { QuoteSummary } from "@/server/repositories/quotation-repository";
 type QuoteListProps = Readonly<{
   quotes: readonly QuoteSummary[];
   onDeleteQuote?: (quoteId: string) => void | Promise<void>;
+  onCopyQuote?: (quoteId: string) => void | Promise<void>;
+  disabledQuoteId?: string | null;
 }>;
 
 function matchesQuery(quote: QuoteSummary, query: string): boolean {
@@ -23,7 +25,7 @@ function matchesQuery(quote: QuoteSummary, query: string): boolean {
     .includes(normalized);
 }
 
-export function QuoteList({ quotes, onDeleteQuote }: QuoteListProps) {
+export function QuoteList({ quotes, onDeleteQuote, onCopyQuote, disabledQuoteId }: QuoteListProps) {
   const [query, setQuery] = useState("");
   const [pendingDelete, setPendingDelete] = useState<QuoteSummary | null>(null);
 
@@ -91,8 +93,19 @@ export function QuoteList({ quotes, onDeleteQuote }: QuoteListProps) {
                 </td>
                 <td>{new Date(quote.updatedAt).toLocaleString("zh-CN")}</td>
                 <td>
+                  {onCopyQuote ? (
+                    <button
+                      className="text-button focus-ring"
+                      disabled={disabledQuoteId === quote.id}
+                      onClick={() => onCopyQuote(quote.id)}
+                      type="button"
+                    >
+                      复制
+                    </button>
+                  ) : null}
                   <button
                     className="text-button focus-ring"
+                    disabled={disabledQuoteId === quote.id}
                     onClick={() => setPendingDelete(quote)}
                     type="button"
                   >

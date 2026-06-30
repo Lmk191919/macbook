@@ -1,4 +1,4 @@
-import { type NextResponse, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
 import {

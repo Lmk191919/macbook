@@ -5,8 +5,9 @@ import { describe, expect, it, vi } from "vitest";
 import { QuoteList } from "@/components/quotes/quote-list";
 
 describe("QuoteList", () => {
-  it("filters quotes by keyword and requires delete confirmation", async () => {
+  it("filters quotes and exposes copy / delete actions", async () => {
     const onDeleteQuote = vi.fn();
+    const onCopyQuote = vi.fn();
     const user = userEvent.setup();
 
     render(
@@ -42,6 +43,7 @@ describe("QuoteList", () => {
           },
         ]}
         onDeleteQuote={onDeleteQuote}
+        onCopyQuote={onCopyQuote}
       />,
     );
 
@@ -60,5 +62,8 @@ describe("QuoteList", () => {
 
     await user.click(within(dialog).getByRole("button", { name: "确认删除" }));
     expect(onDeleteQuote).toHaveBeenCalledWith("quote-1");
+
+    await user.click(screen.getByRole("button", { name: "复制" }));
+    expect(onCopyQuote).toHaveBeenCalledWith("quote-1");
   });
 });

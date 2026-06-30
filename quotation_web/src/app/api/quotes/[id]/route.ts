@@ -1,4 +1,3 @@
-import { type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { errorResponse, parseJsonBody, repositoryErrorResponse, resolveParams, successResponse } from "@/app/api/_utils";
@@ -54,7 +53,7 @@ const quoteDocumentSchema = z.object({
 });
 
 export async function GET(
-  _request: NextRequest,
+  _request: Request,
   context: { params: { id: string } | Promise<{ id: string }> },
 ) {
   const { id } = await resolveParams(context.params);
@@ -69,7 +68,7 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   context: { params: { id: string } | Promise<{ id: string }> },
 ) {
   const body = await parseJsonBody(request);
@@ -83,8 +82,8 @@ export async function PATCH(
   try {
     const { id } = await resolveParams(context.params);
     const repository = await createQuotationRepository();
-    const quote = "spaces" in parsed.data || "adjustments" in parsed.data
-      ? await repository.saveQuoteDocument(id, parsed.data.version, parsed.data)
+    const quote = "spaces" in parsed.data && "adjustments" in parsed.data
+      ? await repository.saveQuoteDocument(id, parsed.data.version, parsed.data as z.infer<typeof quoteDocumentSchema>)
       : await repository.updateQuote(id, parsed.data.version, parsed.data);
     return successResponse(quote);
   } catch (error) {
@@ -93,7 +92,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  _request: Request,
   context: { params: { id: string } | Promise<{ id: string }> },
 ) {
   try {

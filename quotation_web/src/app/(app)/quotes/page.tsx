@@ -1,5 +1,5 @@
 import { NewQuoteDialog } from "@/components/quotes/new-quote-dialog";
-import { QuoteList } from "@/components/quotes/quote-list";
+import { QuoteListShell } from "@/components/quotes/quote-list-shell";
 import { createQuotationRepository } from "@/server/repositories";
 
 export default async function QuotesPage() {
@@ -15,7 +15,7 @@ export default async function QuotesPage() {
         </div>
         <NewQuoteDialog />
       </div>
-      <QuoteList quotes={quotes} />
+      <QuoteListShell quotes={quotes} />
     </main>
   );
 }

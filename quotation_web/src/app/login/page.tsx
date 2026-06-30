@@ -1,16 +1,17 @@
 import Link from "next/link";
 
 type LoginPageProps = Readonly<{
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }>;
 
-function hasLoginError(searchParams: LoginPageProps["searchParams"]): boolean {
+function hasLoginError(searchParams?: Record<string, string | string[] | undefined>): boolean {
   const error = searchParams?.error;
   return error === "1" || error === "true";
 }
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
-  const showError = hasLoginError(searchParams);
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const showError = hasLoginError(resolvedSearchParams);
 
   return (
     <main className="auth-page">
