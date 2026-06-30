@@ -1,0 +1,97 @@
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+.print-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.print-sheet {
+  display: grid;
+  gap: 1.5rem;
+  background: white;
+}
+
+.print-sheet__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: start;
+}
+
+.print-sheet__header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.print-meta {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.print-meta div,
+.print-summary div {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.print-meta dd,
+.print-meta dt {
+  margin: 0;
+}
+
+.print-section {
+  break-inside: avoid;
+}
+
+.print-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.print-grid__wide {
+  grid-column: 1 / -1;
+}
+
+.print-space-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.print-table {
+  min-width: 0;
+}
+
+.print-summary {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.print-summary__grand {
+  padding-top: 0.75rem;
+  border-top: 2px solid color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+@media print {
+  .site-header,
+  .app-topbar,
+  .print-toolbar {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  .print-page {
+    padding: 0;
+  }
+}
