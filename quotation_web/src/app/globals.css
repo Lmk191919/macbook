@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #173b35;
+  --gold: #e4a853;
+  --paper: #f4f2ed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.site-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  padding: 1rem 1.5rem;
+}
+
+.site-brand {
+  color: var(--ink);
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-decoration: none;
+}
