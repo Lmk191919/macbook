@@ -143,6 +143,53 @@ export type QuoteAdjustmentRecord = Readonly<{
   sortOrder: number;
 }>;
 
+export type QuoteDraftSpaceInput = Readonly<{
+  id?: string;
+  name: string;
+  notes?: string;
+  area?: number;
+  wallArea?: number;
+  sortOrder: number;
+  items: Array<
+    Readonly<{
+      id?: string;
+      sourceCatalogItemId?: string;
+      name: string;
+      description?: string;
+      unit: string;
+      quantity: number;
+      pricingMode: "combined" | "split";
+      combinedUnitPrice: number;
+      laborUnitPrice: number;
+      materialUnitPrice: number;
+      notes?: string;
+      sortOrder: number;
+    }>
+  >;
+}>;
+
+export type QuoteDraftAdjustmentInput = Readonly<{
+  id?: string;
+  kind: "charge" | "discount";
+  name: string;
+  amount: number;
+  notes?: string;
+  sortOrder: number;
+}>;
+
+export type QuoteDocumentInput = Readonly<{
+  customerName?: string;
+  customerPhone?: string;
+  projectName?: string;
+  area?: number;
+  renovationType?: string;
+  address?: string;
+  notes?: string;
+  status?: QuoteStatus;
+  spaces: QuoteDraftSpaceInput[];
+  adjustments: QuoteDraftAdjustmentInput[];
+}>;
+
 export type CatalogItemInput = Readonly<{
   name: string;
   spaces: readonly string[];
@@ -209,6 +256,7 @@ export type QuotationRepository = Readonly<{
   getQuote: (quoteId: string) => Promise<QuoteRecord | null>;
   createQuote: (input: QuoteInput) => Promise<QuoteRecord>;
   updateQuote: (quoteId: string, version: number, input: QuoteUpdateInput) => Promise<QuoteRecord>;
+  saveQuoteDocument: (quoteId: string, version: number, input: QuoteDocumentInput) => Promise<QuoteRecord>;
   copyQuote: (quoteId: string) => Promise<QuoteRecord>;
   deleteQuote: (quoteId: string) => Promise<void>;
   createSpace: (quoteId: string, input: QuoteSpaceInput) => Promise<QuoteSpaceRecord>;

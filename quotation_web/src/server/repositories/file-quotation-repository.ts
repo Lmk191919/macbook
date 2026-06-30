@@ -16,6 +16,7 @@ import {
   type QuoteAdjustmentInput,
   type QuoteAdjustmentRecord,
   type QuoteAdjustmentUpdateInput,
+  type QuoteDocumentInput,
   type QuoteInput,
   type QuoteItemInput,
   type QuoteItemRecord,
@@ -197,6 +198,81 @@ export class FileQuotationRepository implements QuotationRepository {
 
       this.validateQuote(quote);
 
+      return cloneRecord(quote);
+    });
+  }
+
+  async saveQuoteDocument(quoteId: string, version: number, input: QuoteDocumentInput): Promise<QuoteRecord> {
+    return this.mutateState((state) => {
+      const quote = this.requireQuote(state, quoteId);
+      if (quote.version !== version) {
+        throw versionConflict("VERSION_CONFLICT");
+      }
+
+      Object.assign(
+        quote,
+        definedPatch({
+          customerName: input.customerName?.trim(),
+          customerPhone: input.customerPhone?.trim(),
+          projectName: input.projectName?.trim(),
+          area: input.area,
+          renovationType: input.renovationType?.trim(),
+          address: input.address?.trim(),
+          notes: input.notes?.trim(),
+          status: input.status,
+        }),
+      );
+
+      quote.spaces = input.spaces
+        .map((space, spaceIndex) => {
+          const nextSpace: QuoteSpaceRecord = {
+            id: this.resolvePersistentId(state, "space", space.id),
+            name: normalizeText(space.name),
+            notes: space.notes?.trim() || undefined,
+            area: space.area,
+            wallArea: space.wallArea,
+            sortOrder: space.sortOrder ?? spaceIndex,
+            items: space.items.map((item, itemIndex) => {
+              const nextItem: QuoteItemRecord = {
+                id: this.resolvePersistentId(state, "item", item.id),
+                sourceCatalogItemId: item.sourceCatalogItemId,
+                name: normalizeText(item.name),
+                description: item.description?.trim() || undefined,
+                unit: normalizeText(item.unit),
+                quantity: item.quantity,
+                pricingMode: item.pricingMode,
+                combinedUnitPrice: item.combinedUnitPrice,
+                laborUnitPrice: item.laborUnitPrice,
+                materialUnitPrice: item.materialUnitPrice,
+                notes: item.notes?.trim() || undefined,
+                sortOrder: item.sortOrder ?? itemIndex,
+              };
+              this.validateItem(nextItem);
+              return nextItem;
+            }),
+          };
+
+          return nextSpace;
+        })
+        .sort((left, right) => left.sortOrder - right.sortOrder);
+
+      quote.adjustments = input.adjustments
+        .map((adjustment, index) => {
+          const nextAdjustment: QuoteAdjustmentRecord = {
+            id: this.resolvePersistentId(state, "adjustment", adjustment.id),
+            kind: adjustment.kind,
+            name: normalizeText(adjustment.name),
+            amount: adjustment.amount,
+            notes: adjustment.notes?.trim() || undefined,
+            sortOrder: adjustment.sortOrder ?? index,
+          };
+          this.validateAdjustment(nextAdjustment);
+          return nextAdjustment;
+        })
+        .sort((left, right) => left.sortOrder - right.sortOrder);
+
+      this.touchQuote(quote);
+      this.validateQuote(quote);
       return cloneRecord(quote);
     });
   }
@@ -677,6 +753,18 @@ export class FileQuotationRepository implements QuotationRepository {
     const counter = state.counters[kind];
     state.counters[kind] += 1;
     return counter;
+  }
+
+  private resolvePersistentId(
+    state: RepositoryState,
+    kind: keyof RepositoryState["counters"],
+    id?: string,
+  ): string {
+    if (id && !id.startsWith("temp_")) {
+      return id;
+    }
+
+    return this.nextId(state, kind);
   }
 
   private requireQuote(state: RepositoryState, quoteId: string): QuoteRecord {
