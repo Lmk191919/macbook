@@ -98,4 +98,44 @@ describe("quotation calculations", () => {
       }),
     ).toThrow("Invalid quantity");
   });
+
+  it("rejects invalid pricing modes", () => {
+    expect(() =>
+      calculateItemTotal({
+        quantity: 1,
+        pricingMode: "bad-mode" as never,
+        combinedUnitPrice: 2800,
+        laborUnitPrice: 0,
+        materialUnitPrice: 0,
+      }),
+    ).toThrow("Invalid pricing mode");
+  });
+
+  it("rejects invalid money values", () => {
+    expect(() =>
+      calculateItemTotal({
+        quantity: 1,
+        pricingMode: "combined",
+        combinedUnitPrice: Number.NaN,
+        laborUnitPrice: 0,
+        materialUnitPrice: 0,
+      }),
+    ).toThrow("Invalid money value");
+
+    expect(() =>
+      calculateQuoteTotals(
+        [{ total: 1000000, labor: 400000, material: 600000 }],
+        [{ kind: "discount", amount: -1 }],
+      ),
+    ).toThrow("Invalid money value");
+  });
+
+  it("rejects invalid adjustment kinds", () => {
+    expect(() =>
+      calculateQuoteTotals(
+        [{ total: 1000000, labor: 400000, material: 600000 }],
+        [{ kind: "rebate" as never, amount: 1000 }],
+      ),
+    ).toThrow("Invalid adjustment kind");
+  });
 });

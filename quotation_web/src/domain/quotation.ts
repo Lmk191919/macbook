@@ -59,12 +59,34 @@ function assertValidQuantity(quantity: number): void {
   }
 }
 
+function assertValidMoneyValue(value: number): void {
+  if (!Number.isFinite(value) || !Number.isInteger(value) || value < 0) {
+    throw new Error("Invalid money value");
+  }
+}
+
+function assertValidPricingMode(pricingMode: string): asserts pricingMode is PricingMode {
+  if (pricingMode !== "combined" && pricingMode !== "split") {
+    throw new Error("Invalid pricing mode");
+  }
+}
+
+function assertValidAdjustmentKind(kind: string): asserts kind is QuoteAdjustment["kind"] {
+  if (kind !== "charge" && kind !== "discount") {
+    throw new Error("Invalid adjustment kind");
+  }
+}
+
 function roundMoney(quantity: number, unitPrice: number): number {
   return Math.round(quantity * unitPrice);
 }
 
 export function calculateItemBreakdown(item: QuoteItem): QuoteItemBreakdown {
   assertValidQuantity(item.quantity);
+  assertValidPricingMode(item.pricingMode);
+  assertValidMoneyValue(item.combinedUnitPrice);
+  assertValidMoneyValue(item.laborUnitPrice);
+  assertValidMoneyValue(item.materialUnitPrice);
 
   if (item.pricingMode === "combined") {
     const total = roundMoney(item.quantity, item.combinedUnitPrice);
@@ -87,11 +109,17 @@ export function calculateItemTotal(item: QuoteItem): number {
 
 export function calculateSpaceTotal(items: readonly QuoteSpaceContribution[]): QuoteSpaceTotal {
   return items.reduce<QuoteSpaceTotal>(
-    (totals, item) => ({
-      total: totals.total + item.total,
-      labor: totals.labor + item.labor,
-      material: totals.material + item.material,
-    }),
+    (totals, item) => {
+      assertValidMoneyValue(item.total);
+      assertValidMoneyValue(item.labor);
+      assertValidMoneyValue(item.material);
+
+      return {
+        total: totals.total + item.total,
+        labor: totals.labor + item.labor,
+        material: totals.material + item.material,
+      };
+    },
     { total: 0, labor: 0, material: 0 },
   );
 }
@@ -118,6 +146,9 @@ export function calculateQuoteTotals(
   );
 
   const adjustmentTotal = adjustments.reduce((total, adjustment) => {
+    assertValidAdjustmentKind(adjustment.kind);
+    assertValidMoneyValue(adjustment.amount);
+
     if (adjustment.kind === "charge") {
       return total + adjustment.amount;
     }
