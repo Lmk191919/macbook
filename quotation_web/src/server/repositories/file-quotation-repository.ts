@@ -3,6 +3,11 @@ import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 
 import {
+  calculateItemBreakdown,
+  calculateQuoteTotals,
+  calculateSpaceTotal,
+} from "@/domain/quotation";
+import {
   cloneRecord,
   notFound,
   type CatalogItemInput,
@@ -129,17 +134,38 @@ export class FileQuotationRepository implements QuotationRepository {
         );
       })
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
-      .map((quote) => ({
-        id: quote.id,
-        quoteNo: quote.quoteNo,
-        customerName: quote.customerName,
-        projectName: quote.projectName,
-        area: quote.area,
-        renovationType: quote.renovationType,
-        status: quote.status,
-        version: quote.version,
-        updatedAt: quote.updatedAt,
-      }));
+      .map((quote) => {
+        const totals = calculateQuoteTotals(
+          quote.spaces.map((space) =>
+            calculateSpaceTotal(
+              space.items.map((item) => {
+                const breakdown = calculateItemBreakdown(item);
+                return {
+                  total: breakdown.total,
+                  labor: breakdown.laborTotal,
+                  material: breakdown.materialTotal,
+                };
+              }),
+            ),
+          ),
+          quote.adjustments,
+        );
+
+        return {
+          id: quote.id,
+          quoteNo: quote.quoteNo,
+          customerName: quote.customerName,
+          projectName: quote.projectName,
+          area: quote.area,
+          renovationType: quote.renovationType,
+          status: quote.status,
+          version: quote.version,
+          updatedAt: quote.updatedAt,
+          subtotal: totals.subtotal,
+          adjustmentTotal: totals.adjustmentTotal,
+          grandTotal: totals.grandTotal,
+        };
+      });
   }
 
   async getQuote(quoteId: string): Promise<QuoteRecord | null> {

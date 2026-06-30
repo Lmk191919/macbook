@@ -44,6 +44,9 @@ export type QuoteSummary = Readonly<{
   status: QuoteStatus;
   version: number;
   updatedAt: string;
+  subtotal: number;
+  adjustmentTotal: number;
+  grandTotal: number;
 }>;
 
 export type QuoteSpaceInput = Readonly<{

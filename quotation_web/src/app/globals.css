@@ -5,6 +5,8 @@
   --gold: #e4a853;
   --paper: #f4f2ed;
   --focus: #0b6b5b;
+  --card: rgba(255, 255, 255, 0.86);
+  --card-solid: #fffdf8;
 }
 
 * {
@@ -15,7 +17,8 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  line-height: 1.5;
 }
 
 a {
@@ -37,6 +40,280 @@ a {
   font-size: 1.125rem;
   font-weight: 700;
   text-decoration: none;
+}
+
+.app-workspace {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--gold) 20%, transparent), transparent 30%),
+    linear-gradient(180deg, #fffdfa 0%, var(--paper) 100%);
+}
+
+.app-topbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+.app-topbar h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+}
+
+.app-topbar__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 64%, var(--gold));
+}
+
+.app-nav {
+  display: inline-flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.app-nav a {
+  text-decoration: none;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, white 86%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.app-workspace__content {
+  padding: 1.25rem 1.5rem 2rem;
+}
+
+.page-frame {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-kicker {
+  margin: 0 0 0.35rem;
+  color: color-mix(in srgb, var(--ink) 60%, var(--gold));
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page-head h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+}
+
+.card {
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border-radius: 1.25rem;
+  background: var(--card);
+  box-shadow: 0 20px 50px color-mix(in srgb, var(--ink) 8%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.stack {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.field--search {
+  flex: 1 1 320px;
+}
+
+.field span {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.input {
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: 0.9rem;
+  padding: 0.85rem 1rem;
+  background: var(--card-solid);
+  color: var(--ink);
+  font: inherit;
+}
+
+.input[type="search"]::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.link {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.table-shell {
+  overflow: auto;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 780px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+
+.data-table th {
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 70%, white);
+  background: color-mix(in srgb, white 80%, var(--paper));
+}
+
+.data-table tbody tr:hover {
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+}
+
+.data-table td .muted {
+  margin-top: 0.25rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  background: color-mix(in srgb, var(--gold) 18%, white);
+  color: var(--ink);
+}
+
+.badge--success {
+  background: color-mix(in srgb, #2b8567 18%, white);
+}
+
+.badge--muted {
+  background: color-mix(in srgb, var(--ink) 10%, white);
+  color: color-mix(in srgb, var(--ink) 70%, white);
+}
+
+.text-button,
+.button {
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.text-button {
+  background: transparent;
+  color: var(--ink);
+  padding: 0.25rem 0;
+}
+
+.button {
+  padding: 0.8rem 1.1rem;
+  background: linear-gradient(135deg, var(--ink) 0%, color-mix(in srgb, var(--ink) 80%, black) 100%);
+  color: white;
+}
+
+.button--ghost {
+  background: color-mix(in srgb, white 82%, var(--paper));
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.button--danger {
+  background: linear-gradient(135deg, #9a3d2f 0%, #b84d37 100%);
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.empty-state {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: color-mix(in srgb, var(--ink) 70%, white);
+}
+
+.muted {
+  color: color-mix(in srgb, var(--ink) 60%, white);
+  font-size: 0.9rem;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in srgb, black 35%, transparent);
+  z-index: 20;
+}
+
+.dialog-card {
+  width: min(100%, 32rem);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border-radius: 1.25rem;
+  background: white;
+  padding: 1.25rem;
+  box-shadow: 0 30px 80px color-mix(in srgb, black 25%, transparent);
+}
+
+.dialog-card h2 {
+  margin: 0;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.error-message {
+  margin: 0;
+  color: #9a3d2f;
+  font-weight: 700;
 }
 
 .auth-page {
