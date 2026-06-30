@@ -4,6 +4,7 @@
   --ink: #173b35;
   --gold: #e4a853;
   --paper: #f4f2ed;
+  --focus: #0b6b5b;
 }
 
 * {
@@ -18,7 +19,7 @@ body {
 }
 
 .focus-ring:focus-visible {
-  outline: 3px solid var(--gold);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
 
