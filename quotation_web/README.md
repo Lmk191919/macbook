@@ -79,6 +79,43 @@ SUPABASE_SERVICE_ROLE_KEY=...
 - `QUOTATION_STORAGE`
 - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`（如果用 Supabase）
 
+## 部署到 Vercel
+
+最适合你现在这个项目的方式，是：
+
+1. 代码推到 GitHub
+2. 在 Vercel 导入这个仓库
+3. 生产环境使用 Supabase 存储
+4. 配好团队密码后直接把网址发给同事
+
+推荐的生产环境变量：
+
+```env
+TEAM_PASSWORD=你的团队统一密码
+SESSION_SECRET=一段足够长的随机字符串
+QUOTATION_STORAGE=supabase
+SUPABASE_URL=https://你的项目.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=你的service_role
+```
+
+### 上线步骤
+
+1. 先在 Supabase 执行：
+   - [supabase/schema.sql](/Users/liupei/Documents/zhidi/.worktrees/renovation-quotation-web/quotation_web/supabase/schema.sql)
+   - [supabase/seed.sql](/Users/liupei/Documents/zhidi/.worktrees/renovation-quotation-web/quotation_web/supabase/seed.sql)
+2. 在 Vercel 新建项目并关联代码仓库
+3. 在 Vercel 的 Environment Variables 中填入上面的变量
+4. 触发一次部署
+5. 打开 `/login`，用团队密码验证
+6. 把 Vercel 生成的网址发给同事
+
+### 上线前建议
+
+- `TEAM_PASSWORD` 不要用演示密码
+- `SESSION_SECRET` 建议至少 32 位随机字符串
+- 不要把 `SUPABASE_SERVICE_ROLE_KEY` 放到前端代码或公开文档
+- 正式环境只建议用 `supabase`，不要继续用本地文件模式
+
 ## 验证命令
 
 ```bash
