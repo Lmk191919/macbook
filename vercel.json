@@ -1,6 +1,5 @@
 {
-  "framework": "nextjs",
-  "installCommand": "cd quotation_web && pnpm install",
   "buildCommand": "cd quotation_web && pnpm build",
-  "outputDirectory": "quotation_web/.next"
+  "outputDirectory": "quotation_web/.next",
+  "installCommand": "cd quotation_web && pnpm install"
 }
