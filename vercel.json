@@ -1,6 +1,4 @@
 {
   "framework": "nextjs",
-  "installCommand": "cd quotation_web && npm install",
-  "buildCommand": "cd quotation_web && npm run build",
-  "outputDirectory": "quotation_web/.next"
+  "rootDirectory": "quotation_web"
 }
