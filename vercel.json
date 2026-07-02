@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "installCommand": "corepack enable && cd quotation_web && pnpm install",
-  "buildCommand": "cd quotation_web && pnpm build",
+  "installCommand": "cd quotation_web && npm install",
+  "buildCommand": "cd quotation_web && npm run build",
   "outputDirectory": "quotation_web/.next"
 }
